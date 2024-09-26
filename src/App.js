@@ -1,30 +1,29 @@
-import React, { createContext, useContext, useState } from 'react'; // Added imports
-import AIFetch from './components/AIFetch';
+import React, { createContext, useState } from 'react';
+import './App.css';
 import AIFetchB from './components/AIFetchB';
 import AIFetchC from './components/AIFetchC';
-import PromptBar from './components/PromptBar.js';
+import PromptTemplates from './PromptTemplates';
 
-// Create a context for the state available to all components
 export const PromptContext = createContext();
-export default function App() {
 
-  const [prompt, setPrompt] = useState(null);
-
-  const contextValue = [prompt, setPrompt]; // Define your context value here
+function App() {
+  const [prompt, setPrompt] = useState({ language: 'English', text: '' });
 
   return (
-    <PromptContext.Provider value={contextValue}>
-      <div>
-        <PromptBar />
-        {/* <AIFetch /> */}
-        {prompt && <AIFetchB />}
-        {/* <AIFetchC /> */}
-
+    <PromptContext.Provider value={[prompt, setPrompt]}>
+      <div className="App">
+        <header className="App-header">
+          <h1>AI Fetch Examples</h1>
+        </header>
+        <main>
+          <AIFetchB />
+          <AIFetchC />
+          <PromptTemplates />
+        </main>
       </div>
     </PromptContext.Provider>
   );
 }
 
-// Optional: Custom hook to use the context
-// export const useMyContext = () => useContext(StateContext);
+export default App;
 
