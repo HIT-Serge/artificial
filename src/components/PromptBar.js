@@ -25,7 +25,7 @@ const PromptBar = ({ items, onSearch }) => {
 
     return (
         <div>
-
+            <h1>PromptBar</h1>
             <form onSubmit={handleSubmit}>
 
                 <label>

@@ -45,7 +45,7 @@ const ChatModels = () => {
 
     return (
         <div>
-            <h1>Chat Models</h1>
+            <h1>AIFetchC</h1>
             <button onClick={handleHumanMessage}>Send Human Message</button>
             <button onClick={handleSystemMessage}>Send System Message</button>
             <div>
