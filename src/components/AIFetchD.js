@@ -53,7 +53,7 @@ const AIFetchD = () => {
         const chatInstance = new ChatMistralAI({
             model: "mistral-large-latest",
             temperature: 0,
-            apiKey: process.env.REACT_APP_API_KEY2
+            apiKey: process.env.REACT_APP_API_KEY
         });
         setChat(chatInstance);
     }, []);
