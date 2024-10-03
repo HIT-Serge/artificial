@@ -16,27 +16,16 @@ const AIFetchE = () => {
     const [model, setModel] = useState();
     const [result, setResult] = useState('');
     const [userInput, setUserInput] = useState('');
+    // console.log('userInput', userInput)
     const [chain, setChain] = useState();
-    const [messageHistories, setMessageHistories] = useState({});
+    // const [messageHistories, setMessageHistories] = useState({});
     const [messageHistories2, setMessageHistories2] = useState({});
-    console.log('messageHistories2', messageHistories2)
+    // console.log('messageHistories2', messageHistories2)
 
     // const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    const messages = [
-        new HumanMessage({ content: "hi! I'm bob" }),
-        new AIMessage({ content: "hi!" }),
-        new HumanMessage({ content: "I like vanilla ice cream" }),
-        new AIMessage({ content: "nice" }),
-        new HumanMessage({ content: "whats 2 + 2" }),
-        new AIMessage({ content: "4" }),
-        new HumanMessage({ content: "thanks" }),
-        new AIMessage({ content: "No problem!" }),
-        new HumanMessage({ content: "having fun?" }),
-        new AIMessage({ content: "yes!" }),
-        new HumanMessage({ content: "That's great!" }),
-        new AIMessage({ content: "yes it is!" }),
-    ];
+    const [messages, setMessages] = useState([]);
+    // console.log('messages', messages)
 
     useEffect(() => {
         // Initialize ChatMistralAI
@@ -81,6 +70,7 @@ const AIFetchE = () => {
                 getMessageHistory: async (sessionId) => {
                     if (messageHistories2[sessionId] === undefined) {
                         const messageHistory = new InMemoryChatMessageHistory();
+                        console.log('messageHistory', messageHistory)
                         await messageHistory.addMessages(messages);
                         messageHistories2[sessionId] = messageHistory;
                     }
@@ -111,91 +101,42 @@ const AIFetchE = () => {
 
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent form submission from reloading the page
-        console.log('submit')
-        // if (messageHistories.invoke) {
-        if (messageHistories2.invoke) {
+        if (userInput) {
+            e.preventDefault(); // Prevent form submission from reloading the page
+            setResult('');
+            console.log('submit');
 
-            // const config = {
-            //     configurable: {
-            //         sessionId: "abc2",
-            //     },
-            // };
-
-            // const response = await messageHistories.invoke(
-            //     {
-            //         input: "Hi! I'm Bob",
-            //     },
-            //     config
-            // );
+            if (messageHistories2.invoke) {
+                const config5 = {
+                    configurable: {
+                        sessionId: "abc6",
+                    },
+                };
 
 
+                // hier wordt de stream gemaakt ofwel alle tokens die 1 voor 1 terugkomen
+                const stream = await messageHistories2.stream(
+                    {
+                        input: userInput,
+                        chat_history: messages,
+                    },
+                    config5
+                );
 
-            // const config2 = {
-            //     configurable: {
-            //         sessionId: "abc3",
-            //     },
-            // };
+                let fullResult = '';
 
-            // const response2 = await messageHistories.invoke(
-            //     {
-            //         input: "What's my name?",
-            //     },
-            //     config2
-            // );
+                for await (const chunk of stream) {
+                    fullResult += chunk.content;
+                    setResult(fullResult);
+                }
 
-            // const config3 = {
-            //     configurable: {
-            //         sessionId: "abc2",
-            //     },
-            // };
-
-            // const response3 = await messageHistories.invoke(
-            //     {
-            //         input: "What's my name?",
-            //     },
-            //     config3
-            // );
-
-            // const response4 = await chain.invoke({
-            //     chat_history: messages,
-            //     input: "what's my name?",
-            // });
-            // const response5 = await chain.invoke({
-            //     chat_history: messages,
-            //     input: "what's my fav ice cream",
-            // });
-
-            const config4 = {
-                configurable: {
-                    sessionId: "abc4",
-                },
-            };
-
-            const response7 = await messageHistories2.invoke(
-                {
-                    input: "whats my name?",
-                    chat_history: [],
-                },
-                config4
-            );
-            const response8 = await messageHistories2.invoke(
-                {
-                    input: "whats my favorite ice cream?",
-                    chat_history: [],
-                },
-                config4
-            );
-
-
-            // setResult(response.content);
-            // console.log('response', response.content);
-            // console.log('response2', response2.content);
-            // console.log('response3', response3.content);
-            // console.log('response4', response4.content);
-            // console.log('response5', response5.content);
-            console.log('response7', response7);
-            console.log('response8', response8);
+                // Add user input to messages
+                setMessages(prevMessages => [...prevMessages, new HumanMessage({ content: userInput })]);
+                // Add AI response to messages
+                setMessages(prevMessages => [...prevMessages, new AIMessage({ content: fullResult })]);
+                // Clear user input
+                setUserInput('');
+            }
         }
     };
 
@@ -212,13 +153,20 @@ const AIFetchE = () => {
                 <button type="submit">Submit</button>
             </form>
             <div>
-                <h2>Result:</h2>
-                <p>{result}</p>
+                {/* <h2>Result:</h2>
+                <p>{result}</p> */}
+            </div>
+            <div>
+                <h2>Chat History:</h2>
+                {messages.map((message, index) => (
+                    <p key={index}>
+                        <strong>{message instanceof HumanMessage ? 'Human: ' : 'AI: '}</strong>
+                        {message.content}
+                    </p>
+                ))}
             </div>
         </div>
     );
 };
-
-
 
 export default AIFetchE;
