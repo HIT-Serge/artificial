@@ -14,10 +14,13 @@ import {
 
 const AIFetchE = () => {
     const [model, setModel] = useState();
+    // console.log('model', model);
     const [result, setResult] = useState('');
     const [userInput, setUserInput] = useState('');
-    // console.log('userInput', userInput)
+    // console.log('userInput', userInput);
     const [chain, setChain] = useState();
+    // console.log('chain', chain);
+
     // const [messageHistories, setMessageHistories] = useState({});
     const [messageHistories2, setMessageHistories2] = useState({});
     // console.log('messageHistories2', messageHistories2)
@@ -28,6 +31,7 @@ const AIFetchE = () => {
     // console.log('messages', messages)
 
     useEffect(() => {
+
         // Initialize ChatMistralAI
         const chatInstance = new ChatMistralAI({
             model: "mistral-large-latest",
@@ -64,6 +68,20 @@ const AIFetchE = () => {
     // }, [chain]);
 
     useEffect(() => {
+
+        if (model) {
+            const chain2 = RunnableSequence.from([
+                RunnablePassthrough.assign({
+                    chat_history: filterMessages,
+                }),
+                prompt,
+                model,
+            ]);
+            setChain(chain2);
+        }
+    }, [model]);
+
+    useEffect(() => {
         if (chain) {
             const withMessageHistory2 = new RunnableWithMessageHistory({
                 runnable: chain,
@@ -84,29 +102,24 @@ const AIFetchE = () => {
     }
         , [chain]);
 
+
+    // useEffect(() => {
+    //     console.log("Current messageHistories2:", messageHistories2);
+    // }, [messageHistories2]);
     // beter begrijpen
-    useEffect(() => {
-        if (model) {
-            const chain2 = RunnableSequence.from([
-                RunnablePassthrough.assign({
-                    chat_history: filterMessages,
-                }),
-                prompt,
-                model,
-            ]);
-            setChain(chain2);
-        }
-    }, []);
 
 
 
     const handleSubmit = async (e) => {
+        console.log('handleSubmit');
         if (userInput) {
+            console.log('bereikt if')
             e.preventDefault(); // Prevent form submission from reloading the page
-            setResult('');
-            console.log('submit');
+            // setResult('');
+            // console.log('submit');
 
             if (messageHistories2.invoke) {
+                console.log('bereikt if2')
                 const config5 = {
                     configurable: {
                         sessionId: "abc6",
@@ -137,8 +150,11 @@ const AIFetchE = () => {
                 // Clear user input
                 setUserInput('');
             }
+
         }
     };
+
+
 
     return (
         <div>
